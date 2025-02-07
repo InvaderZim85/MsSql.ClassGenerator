@@ -1,0 +1,2 @@
+﻿$ATTRIBUTES$
+public $TYPE$$NULLABLE$ $NAME$ { get; set; }

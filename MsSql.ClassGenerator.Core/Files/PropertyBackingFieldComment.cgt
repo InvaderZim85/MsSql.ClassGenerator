@@ -1,0 +1,14 @@
+/// <summary>
+/// Backing field for <see cref="$NAME$"/>
+/// </summary>
+private $TYPE$$NULLABLE$ $NAME2$;
+
+/// <summary>
+/// Gets or sets the TODO
+/// </summary>
+$ATTRIBUTES$
+public $TYPE$$NULLABLE$ $NAME$
+{
+    get => $NAME2$;
+    set => $NAME2$ = value;
+}

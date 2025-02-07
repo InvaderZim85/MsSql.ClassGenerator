@@ -1,0 +1,8 @@
+private $TYPE$$NULLABLE$ $NAME2$;
+
+$ATTRIBUTES$
+public $TYPE$$NULLABLE$ $NAME$
+{
+    get => $NAME2$;
+    set => $NAME2$ = value;
+}

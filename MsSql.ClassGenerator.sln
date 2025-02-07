@@ -1,9 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.12.35707.178 d17.12
+VisualStudioVersion = 17.12.35707.178
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MsSql.ClassGenerator", "MsSql.ClassGenerator\MsSql.ClassGenerator.csproj", "{92A6F4C6-0D7D-4E7E-9CCE-24F9E9DE98B7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MsSql.ClassGenerator.Core", "MsSql.ClassGenerator.Core\MsSql.ClassGenerator.Core.csproj", "{44965BC7-899C-4A3F-ABF0-40CAC5D462B0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MsSql.ClassGenerator.Cli", "MsSql.ClassGenerator.Cli\MsSql.ClassGenerator.Cli.csproj", "{FD598726-FA28-40A1-AC69-74B0FF8415DF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{92A6F4C6-0D7D-4E7E-9CCE-24F9E9DE98B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{92A6F4C6-0D7D-4E7E-9CCE-24F9E9DE98B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{92A6F4C6-0D7D-4E7E-9CCE-24F9E9DE98B7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{44965BC7-899C-4A3F-ABF0-40CAC5D462B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{44965BC7-899C-4A3F-ABF0-40CAC5D462B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{44965BC7-899C-4A3F-ABF0-40CAC5D462B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{44965BC7-899C-4A3F-ABF0-40CAC5D462B0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FD598726-FA28-40A1-AC69-74B0FF8415DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FD598726-FA28-40A1-AC69-74B0FF8415DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FD598726-FA28-40A1-AC69-74B0FF8415DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FD598726-FA28-40A1-AC69-74B0FF8415DF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
