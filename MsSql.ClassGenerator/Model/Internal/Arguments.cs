@@ -5,7 +5,7 @@ namespace MsSql.ClassGenerator.Model.Internal;
 /// <summary>
 /// Provides the arguments.
 /// </summary>
-internal sealed class Arguments
+public sealed class Arguments
 {
     /// <summary>
     /// Gets or sets the name / path of the ms sql server.

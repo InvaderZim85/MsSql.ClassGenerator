@@ -1,14 +1,246 @@
-﻿<mah:MetroWindow x:Class="MsSql.ClassGenerator.Ui.View.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:MsSql.ClassGenerator.Ui.View"
-        xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
-        mc:Ignorable="d"
-        mah:DialogParticipation.Register="{Binding}"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        
-    </Grid>
+﻿<mah:MetroWindow
+    x:Class="MsSql.ClassGenerator.Ui.View.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:MsSql.ClassGenerator.Ui.ViewModel.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:MsSql.ClassGenerator.Ui.View"
+    xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="MainWindow"
+    Width="800"
+    Height="450"
+    mah:DialogParticipation.Register="{Binding}"
+    Loaded="MainWindow_OnLoaded"
+    ResizeMode="CanResizeWithGrip"
+    TitleCharacterCasing="Normal"
+    mc:Ignorable="d">
+    <DockPanel LastChildFill="True">
+        <StatusBar DockPanel.Dock="Bottom">
+            <StatusBarItem Content="INFO" />
+        </StatusBar>
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <!--  Connection  -->
+            <Border Grid.Row="0" Style="{StaticResource BorderStyle}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="200" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <controls:HeadlineControl
+                        Grid.Row="0"
+                        Grid.Column="0"
+                        Grid.ColumnSpan="3"
+                        HeadlineText="Connection"
+                        IconKind="AngleDoubleRight" />
+
+                    <Label
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        Content="Server:" />
+                    <ComboBox Grid.Row="1" Grid.Column="1" />
+                    <Button
+                        Grid.Row="1"
+                        Grid.Column="2"
+                        Width="75"
+                        HorizontalAlignment="Left"
+                        Content="Connect" />
+
+                    <Label
+                        Grid.Row="2"
+                        Grid.Column="0"
+                        Content="Database:" />
+                    <ComboBox Grid.Row="2" Grid.Column="1" />
+                    <Button
+                        Grid.Row="2"
+                        Grid.Column="2"
+                        Width="75"
+                        HorizontalAlignment="Left"
+                        Content="Select" />
+                </Grid>
+            </Border>
+
+            <!--  Options  -->
+            <Border Grid.Row="1" Style="{StaticResource BorderStyle}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="34" />
+                        <RowDefinition Height="34" />
+                        <RowDefinition Height="34" />
+                        <RowDefinition Height="34" />
+                        <RowDefinition Height="34" />
+                        <RowDefinition Height="34" />
+                    </Grid.RowDefinitions>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <controls:HeadlineControl
+                        Grid.Row="0"
+                        Grid.Column="0"
+                        Grid.ColumnSpan="2"
+                        HeadlineText="Settings / Options" />
+
+                    <Label
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        Content="Target:" />
+                    <Grid Grid.Row="1" Grid.Column="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <TextBox Grid.Column="0" />
+                        <Button
+                            Grid.Column="1"
+                            Width="40"
+                            Content="..." />
+                        <CheckBox
+                            Grid.Column="2"
+                            Content="Clean output"
+                            ToolTip="Deletes the contents of the folder before the new classes are generated. ALL existing files are irrevocably deleted!" />
+                    </Grid>
+
+                    <Label
+                        Grid.Row="2"
+                        Grid.Column="0"
+                        Content="Namespace:" />
+                    <Grid Grid.Row="2" Grid.Column="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="200" />
+                        </Grid.ColumnDefinitions>
+
+                        <TextBox Grid.Column="0" />
+                        <Label Grid.Column="1" Content="Modifier:" />
+                        <ComboBox Grid.Column="2" />
+                    </Grid>
+
+                    <Label
+                        Grid.Row="3"
+                        Grid.Column="0"
+                        Content="Options:" />
+                    <Grid Grid.Row="3" Grid.Column="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <CheckBox Grid.Column="0" Content="Add 'sealed' modifier" />
+                        <CheckBox Grid.Column="1" Content="DB-Model (EF-Core)" />
+                        <CheckBox Grid.Column="2" Content="Add column attribute" />
+                    </Grid>
+                    <Grid Grid.Row="4" Grid.Column="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <CheckBox Grid.Column="0" Content="Add backing field" />
+                        <CheckBox Grid.Column="1" Content="Add 'SetProperty'" />
+                        <CheckBox Grid.Column="2" Content="Add Summary" />
+                    </Grid>
+                    <Grid Grid.Row="5" Grid.Column="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <CheckBox Grid.Column="0" Content="Add table name (to class summary)" />
+                    </Grid>
+                </Grid>
+            </Border>
+
+            <!--  Data  -->
+            <Border Grid.Row="2" Style="{StaticResource BorderStyle}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <controls:HeadlineControl
+                        Grid.Row="0"
+                        Grid.Column="0"
+                        Grid.ColumnSpan="2"
+                        HeadlineText="Tables / Columns" />
+
+                    <Label
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        HorizontalAlignment="Left"
+                        Content="Tables" />
+
+                    <Label
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        HorizontalAlignment="Left"
+                        Content="Columns" />
+
+                    <TextBox
+                        Grid.Row="2"
+                        Grid.Column="0"
+                        Style="{StaticResource TextBoxFilter}" />
+
+                    <TextBox
+                        Grid.Row="2"
+                        Grid.Column="1"
+                        Style="{StaticResource TextBoxFilter}" />
+
+                    <!--  Grids  -->
+                    <DataGrid Grid.Row="3" Grid.Column="0">
+                        <DataGrid.Columns>
+                            <DataGridCheckBoxColumn Width="Auto" />
+                            <DataGridTextColumn Width="*" Header="Name" />
+                            <DataGridCheckBoxColumn Width="*" Header="Alias" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <DataGrid Grid.Row="3" Grid.Column="1">
+                        <DataGrid.Columns>
+                            <DataGridCheckBoxColumn Width="Auto" />
+                            <DataGridTextColumn Width="*" Header="Name" />
+                            <DataGridCheckBoxColumn Width="*" Header="Alias" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </Border>
+
+            <StackPanel Grid.Row="3" Orientation="Horizontal">
+                <Button Width="75" Content="Reset" />
+                <Button Width="75" Content="Create" />
+            </StackPanel>
+        </Grid>
+    </DockPanel>
 </mah:MetroWindow>

@@ -1,17 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using MahApps.Metro.Controls;
+using MsSql.ClassGenerator.Model.Internal;
+using MsSql.ClassGenerator.Ui.ViewModel;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using MahApps.Metro.Controls;
 
 namespace MsSql.ClassGenerator.Ui.View;
 /// <summary>
@@ -19,8 +9,30 @@ namespace MsSql.ClassGenerator.Ui.View;
 /// </summary>
 public partial class MainWindow : MetroWindow
 {
-    public MainWindow()
+    /// <summary>
+    /// Contains the arguments.
+    /// </summary>
+    private readonly Arguments _arguments;
+
+    /// <summary>
+    /// Creates a new instance of the <see cref="MainWindow"/>.
+    /// </summary>
+    /// <param name="arguments">The provided arguments.</param>
+    public MainWindow(Arguments arguments)
     {
         InitializeComponent();
+
+        _arguments = arguments;
+    }
+
+    /// <summary>
+    /// Occurs when the window was loaded.
+    /// </summary>
+    /// <param name="sender">The <see cref="MainWindow"/>.</param>
+    /// <param name="e">The event arguments.</param>
+    private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainWindowViewModel viewModel)
+            viewModel.InitViewModel(_arguments);
     }
 }
