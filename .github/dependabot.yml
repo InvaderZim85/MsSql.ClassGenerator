@@ -6,9 +6,7 @@
 version: 2
 updates:
   - package-ecosystem: "nuget" # See documentation for possible values
-    directories: 
-      - "/MsSql.ClassGenerator.Core/" # Core peojct
-      - "/MsSql.ClassGenerator/" # WPF application
+    directory: "/"
     schedule:
       interval: "weekly"
     assignees: 
