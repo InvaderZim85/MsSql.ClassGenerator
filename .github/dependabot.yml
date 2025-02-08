@@ -7,9 +7,9 @@ version: 2
 updates:
   - package-ecosystem: "nuget" # See documentation for possible values
     directories: 
-      - "/MsSql.ClassGenerator.Cli" # Console application
-      - "/MsSql.ClassGenerator" # WPF project
-      - "/MsSql.ClassGenerator.Core" # Core project
+      - "/MsSql.ClassGenerator.Cli/" # Console application
+      - "/MsSql.ClassGenerator/" # WPF project
+      - "/MsSql.ClassGenerator.Core/" # Core project
     schedule:
       interval: "weekly"
     assignees: 
