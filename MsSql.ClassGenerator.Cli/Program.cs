@@ -5,30 +5,32 @@ using Serilog.Events;
 
 namespace MsSql.ClassGenerator.Cli;
 
-internal class Program
+/// <summary>
+/// Provides the main code.
+/// </summary>
+internal static class Program
 {
-    static async Task Main(string[] args)
+    private static async Task Main(string[] args)
     {
         Helper.InitLog(LogEventLevel.Debug, true);
 
         var options = new ClassGeneratorOptions
         {
-            Output = string.Empty,
-            Namespace = "Blub",
+            Output = @"D:\Dump\ClassGenerator",
+            Namespace = "Some.NameSpace Here",
             SealedClass = true,
-            DbModel = true,
-            AddColumnAttribute = true,
-            WithBackingField = false,
+            DbModel = false,
+            AddColumnAttribute = false,
+            WithBackingField = true,
             AddSetProperty = false,
-            AddSummary = true,
+            AddSummary = false,
             EmptyOutputDirectoryBeforeExport = true,
-            AddTableNameToClassSummary = true,
-            Modifier = "public",
-            Filter = "size_*"
+            AddTableNameToClassSummary = false,
+            Modifier = "public"
         };
 
         var tableManager = new TableManager("(localdb)\\MsSqlLocalDb", "CmsDev");
-        await tableManager.LoadTablesAsync("ProductCategory");
+        await tableManager.LoadTablesAsync("tab*");
 
         var clasGenerator = new ClassManager();
         await clasGenerator.GenerateClassAsync(options, tableManager.Tables);

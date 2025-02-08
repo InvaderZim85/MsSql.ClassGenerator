@@ -94,13 +94,13 @@ public sealed partial class ClassManager
         if (templateFile == null)
         {
             Log.Error("The template for '{type}' is missing.", type);
-            return new TemplateDto(type, string.Empty);
+            return new TemplateDto(type, []);
         }
 
         // Load the content of the file
-        var content = await File.ReadAllTextAsync(templateFile.FullName);
+        var content = await File.ReadAllLinesAsync(templateFile.FullName);
 
-        return new TemplateDto(type, content);
+        return new TemplateDto(type, content.ToList());
     }
 
     /// <summary>
@@ -108,7 +108,7 @@ public sealed partial class ClassManager
     /// </summary>
     /// <param name="options">The options of the class generator.</param>
     /// <returns>The desired template.</returns>
-    private async Task<string> GetClassTemplateAsync(ClassGeneratorOptions options)
+    private async Task<List<string>> GetClassTemplateAsync(ClassGeneratorOptions options)
     {
         if (_templates.Count == 0)
             await LoadTemplatesAsync();
@@ -123,24 +123,27 @@ public sealed partial class ClassManager
     /// </summary>
     /// <param name="options">The options of the class generator.</param>
     /// <returns>The desired template.</returns>
-    private async Task<string> GetPropertyTemplateAsync(ClassGeneratorOptions options)
+    private async Task<List<string>> GetPropertyTemplateAsync(ClassGeneratorOptions options)
     {
         if (_templates.Count == 0)
             await LoadTemplatesAsync();
 
+        // Check the options
+        var withBackingField = options.AddSetProperty || options.WithBackingField;
+
         return options.AddSummary switch
         {
-            true when options is { WithBackingField: true, AddSetProperty: false } => GetTemplateContent(TemplateType
+            true when withBackingField && options is { AddSetProperty: false } => GetTemplateContent(TemplateType
                 .PropertyBackingFieldComment),
-            true when options is { WithBackingField: true, AddSetProperty: true } => GetTemplateContent(TemplateType
+            true when withBackingField && options is { AddSetProperty: true } => GetTemplateContent(TemplateType
                 .PropertyBackingFieldCommentSetField),
-            true when !options.WithBackingField => GetTemplateContent(TemplateType.PropertyDefaultComment),
-            false when options is { WithBackingField: true, AddSetProperty: false } => GetTemplateContent(TemplateType
+            true when !withBackingField => GetTemplateContent(TemplateType.PropertyDefaultComment),
+            false when withBackingField && options is { AddSetProperty: false } => GetTemplateContent(TemplateType
                 .PropertyBackingFieldDefault),
-            false when options is { WithBackingField: true, AddSetProperty: false } => GetTemplateContent(TemplateType
+            false when withBackingField && options is { AddSetProperty: true } => GetTemplateContent(TemplateType
                 .PropertyBackingFieldDefaultSetField),
-            false when !options.WithBackingField => GetTemplateContent(TemplateType.PropertyDefault),
-            _ => string.Empty
+            false when !withBackingField => GetTemplateContent(TemplateType.PropertyDefault),
+            _ => []
         };
     }
 
@@ -149,9 +152,9 @@ public sealed partial class ClassManager
     /// </summary>
     /// <param name="type">The type.</param>
     /// <returns>The template.</returns>
-    private string GetTemplateContent(TemplateType type)
+    private List<string> GetTemplateContent(TemplateType type)
     {
-        return _templates.FirstOrDefault(f => f.Type == type)?.Content ?? string.Empty;
+        return _templates.FirstOrDefault(f => f.Type == type)?.Content ?? [];
     }
 
     #endregion
@@ -172,57 +175,145 @@ public sealed partial class ClassManager
     }
 
     /// <summary>
-    /// Replaces the values.
+    /// Finalizes the template.
     /// </summary>
     /// <param name="content">The content.</param>
     /// <param name="replaceList">The list with the replacement data.</param>
-    /// <returns></returns>
-    private static string ReplaceValues(string content, SortedList<string, string> replaceList)
+    /// <returns>The content of the template.</returns>
+    private static string FinalizeTemplate(List<string> content, List<ReplacementDto> replaceList)
     {
-        foreach (var entry in replaceList)
+        var sb = new StringBuilder();
+
+        foreach (var line in content)
         {
-            var key = $"${entry.Key.ToUpper()}$";
-            content = content.Replace(key, entry.Value);
+            // Check if the line contains a value which should be replaced.
+            if (!line.Contains('$'))
+            {
+                sb.AppendLine(line);
+                continue;
+            }
+
+            var tmpLine = line;
+
+            // Iterate through the replacement values
+            foreach (var replacement in replaceList)
+            {
+                var key = $"${replacement.Key.ToUpper()}$";
+
+                if (!replacement.Indent)
+                {
+                    tmpLine = tmpLine.Replace(key, replacement.Value);
+                    continue;
+                }
+
+                // Split the value, because it's possible that the value has multiple entries
+                var tmpValue = replacement.Value
+                    .Split([Environment.NewLine], StringSplitOptions.None)
+                    .Select(s => $"{Tab}{s}");
+                tmpLine = tmpLine.Replace(key, string.Join(Environment.NewLine, tmpValue));
+            }
+
+            if (!string.IsNullOrWhiteSpace(tmpLine))
+                sb.AppendLine(tmpLine);
         }
 
-        return content;
+        return sb.ToString();
     }
 
     /// <summary>
-    /// Cleans the name of the namespace and removes spaces
+    /// Generates a <i>clean</i> namespace and removes all <i>invalid</i> chars like ä, ö, ü and so on.
     /// </summary>
     /// <param name="name">The name</param>
     /// <returns>The cleaned namespace name</returns>
-    private static string CleanNamespace(string name)
+    private static string GenerateNamespace(string name)
     {
         const char dot = '.';
         if (!name.Contains(dot))
             return name.FirstChatToUpper().Replace(" ", "");
 
-        var content = name.Split(dot, StringSplitOptions.RemoveEmptyEntries).ToList();
+        var content = name.Split(dot, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList();
         name = string.Join(dot, content.Select(s => s.FirstChatToUpper()));
 
-        return name.FirstChatToUpper().Replace(" ", "");
+        var result = name.FirstChatToUpper().Replace(" ", "");
+
+        // Remove all "invalid" chars
+        result = GetInvalidCharReplaceList(false)
+            .Aggregate(result, (current, entry) => current.Replace(entry.Key, entry.Value));
+
+        return result.StartsWithNumber() ? $"Ns{result}" : result;
     }
 
     /// <summary>
-    /// Cleans the content and removes all empty lines.
+    /// Generates a <i>clean</i> class name and removes all <i>invalid</i> chars like ä, ö, ü and so on.
     /// </summary>
-    /// <param name="content">The content.</param>
-    /// <param name="tab">The desired tab.</param>
-    /// <returns>The cleaned content.</returns>
-    private static string CleanContent(string content, string tab = "")
+    /// <param name="name">The desired name.</param>
+    /// <returns>The generated class name.</returns>
+    private static string GenerateClassName(string name)
     {
-        var lines = content.Split([Environment.NewLine], StringSplitOptions.None);
+        IReadOnlyCollection<ReplacementDto> replaceList;
 
-        var sb = new StringBuilder();
-
-        foreach (var line in lines.Where(w => !string.IsNullOrWhiteSpace(w)))
+        if (name.Contains('_'))
         {
-            sb.AppendLine(string.IsNullOrEmpty(tab) ? line : $"{tab}{line}");
+            replaceList = GetInvalidCharReplaceList(false);
+
+            // Split the entry at the underscore
+            var content = name.Split('_', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+            // Create a new "class" name
+            name = content.Aggregate(string.Empty, (current, entry) => current + entry.FirstChatToUpper());
+        }
+        else
+        {
+            replaceList = GetInvalidCharReplaceList();
+            name = name.FirstChatToUpper();
         }
 
-        return sb.ToString();
+        // Remove all "invalid" chars
+        var result = replaceList.Aggregate(name, (current, entry) => current.Replace(entry.Key, entry.Value));
+
+        return result.StartsWithNumber() ? $"Class{result}" : result;
+    }
+
+    /// <summary>
+    /// Generates a <i>clean</i> property name and removes all <i>invalid</i> chars like ä, ö, ü and so on.
+    /// </summary>
+    /// <param name="name">The desired name.</param>
+    /// <returns>The generated property name.</returns>
+    private static string GeneratePropertyName(string name)
+    {
+        // Remove all "invalid" chars
+        name = GetInvalidCharReplaceList(true)
+            .Aggregate(name, (current, entry) => current.Replace(entry.Key, entry.Value));
+
+        // Change the first char to upper
+        name = name.FirstChatToUpper();
+
+        return name.StartsWithNumber() ? $"Column{name}" : name;
+    }
+
+    /// <summary>
+    /// Gets the list with the <i>invalid</i> chars which should be always replaced.
+    /// </summary>
+    /// <param name="includeUnderscore"><see langword="true"/> to include an underscore in the list, otherwise <see langword="false"/>.</param>
+    /// <returns>The list with the values.</returns>
+    public static List<ReplacementDto> GetInvalidCharReplaceList(bool includeUnderscore = true)
+    {
+        var tmpList = new List<ReplacementDto>
+        {
+            new(" ", ""), // this should never happen...
+            new("ä", "ae"),
+            new("ö", "oe"),
+            new("ü", "ue"),
+            new("ß", "ss"),
+            new("Ä", "Ae"),
+            new("Ö", "Oe"),
+            new("Ü", "Ue")
+        };
+
+        if (includeUnderscore)
+            tmpList.Add(new ReplacementDto("_", ""));
+
+        return tmpList;
     }
     #endregion
 }

@@ -12,6 +12,11 @@ namespace MsSql.ClassGenerator.Core.Business;
 public sealed class TableManager(string server, string database)
 {
     /// <summary>
+    /// Occurs when progress was made.
+    /// </summary>
+    public event EventHandler<string>? ProgressEvent; 
+
+    /// <summary>
     /// The instance for the interaction with the table data.
     /// </summary>
     private readonly TableRepo _tableRepo = new(server, database);
@@ -32,8 +37,19 @@ public sealed class TableManager(string server, string database)
     public async Task LoadTablesAsync(string filter)
     {
         Log.Debug("Load tables. Filter: '{filter}'", filter);
+        ProgressEvent?.Invoke(this, "Load tables...");
 
         Tables = await _tableRepo.LoadTablesAsync(filter);
+
+        // Load the PK information
+        var count = 1;
+        foreach (var table in Tables)
+        {
+            var message = $"{count++} of {Tables.Count} > Load PK information for table '{table.Name}'...";
+            Log.Debug(message);
+            ProgressEvent?.Invoke(this, message);
+            await _tableRepo.LoadPrimaryKeyInfoAsync(table);
+        }
 
         Log.Debug("{count} tables loaded.", Tables.Count);
     }

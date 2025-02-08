@@ -108,4 +108,14 @@ public static class Extensions
             ? $"{value[..1].ToUpper()}{value[1..]}"
             : $"{value[..1].ToLower()}{value[1..]}";
     }
+
+    /// <summary>
+    /// Checks if the value starts with a number which is illegal in C#.
+    /// </summary>
+    /// <param name="value">The value which should be checked.</param>
+    /// <returns><see langword="true"/> when the value starts with a number, otherwise <see langword="false"/>.</returns>
+    public static bool StartsWithNumber(this string value)
+    {
+        return !string.IsNullOrWhiteSpace(value) && int.TryParse(value[0].ToString(), out _);
+    }
 }

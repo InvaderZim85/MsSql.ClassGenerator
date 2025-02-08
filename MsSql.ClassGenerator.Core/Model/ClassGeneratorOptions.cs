@@ -68,9 +68,4 @@ public sealed class ClassGeneratorOptions
     /// Gets the value which indicates whether the table name should be added in the class summary.
     /// </summary>
     public required bool AddTableNameToClassSummary { get; init; }
-
-    /// <summary>
-    /// Gets the desired filter.
-    /// </summary>
-    public required string Filter { get; init; }
 }

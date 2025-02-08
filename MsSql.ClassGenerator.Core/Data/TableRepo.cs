@@ -93,9 +93,6 @@ public sealed class TableRepo(string server, string database)
             // Attach the columns.
             table.Columns = columns.Where(f => f.TableId == table.Id).ToList();
 
-            // Load the primary key information.
-            await LoadPrimaryKeyInfoAsync(table);
-
             result.Add(table);
         }
 
@@ -107,7 +104,7 @@ public sealed class TableRepo(string server, string database)
     /// </summary>
     /// <param name="table">The table.</param>
     /// <returns>The awaitable task.</returns>
-    private async Task LoadPrimaryKeyInfoAsync(TableEntry table)
+    public async Task LoadPrimaryKeyInfoAsync(TableEntry table)
     {
         const string query =
             """

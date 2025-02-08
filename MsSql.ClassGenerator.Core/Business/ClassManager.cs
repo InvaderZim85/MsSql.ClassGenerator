@@ -1,7 +1,5 @@
-﻿using System.Dynamic;
-using MsSql.ClassGenerator.Core.Common;
+﻿using MsSql.ClassGenerator.Core.Common;
 using MsSql.ClassGenerator.Core.Model;
-using System.Text;
 
 namespace MsSql.ClassGenerator.Core.Business;
 
@@ -10,8 +8,17 @@ namespace MsSql.ClassGenerator.Core.Business;
 /// </summary>
 public partial class ClassManager
 {
+    /// <summary>
+    /// Occurs when progress was made.
+    /// </summary>
+    public event EventHandler<string>? ProgressEvent; 
+
     public async Task GenerateClassAsync(ClassGeneratorOptions options, List<TableEntry> tables)
     {
+        // Step 0: Check the options.
+        if (!Directory.Exists(options.Output))
+            throw new DirectoryNotFoundException($"The specified output ({options.Output}) folder doesn't exist.");
+
         // Step 1: Load the type conversion information (needed for the class generator).
         await LoadTypeConversionDataAsync();
 
@@ -32,7 +39,7 @@ public partial class ClassManager
     {
         // The list with the replacement values
         // Note: Before replacing, the keys are converted accordingly (capitalised with a leading and trailing dollar sign).
-        var replaceList = new SortedList<string, string>();
+        var replaceList = new List<ReplacementDto>();
 
         // Load the needed template
         var template = await GetClassTemplateAsync(options);
@@ -46,37 +53,40 @@ public partial class ClassManager
             .Select(s => GeneratePropertyCode(options, propertyTemplate, s))
             .ToList();
 
-        replaceList.Add("properties", string.Join(Environment.NewLine, properties));
+        replaceList.Add(new ReplacementDto("properties", string.Join(Environment.NewLine, properties), true));
 
         // Set the name space
-        replaceList.Add("namespace", CleanNamespace(options.Namespace));
+        replaceList.Add(new ReplacementDto("namespace", GenerateNamespace(options.Namespace)));
 
         // Set the modifier
-        replaceList.Add("modifier", options.Modifier);
+        replaceList.Add(new ReplacementDto("modifier", options.Modifier));
 
         // Set the sealed value
-        replaceList.Add("sealed", options.SealedClass ? " sealed" : string.Empty);
+        replaceList.Add(new ReplacementDto("sealed", options.SealedClass ? " sealed" : string.Empty));
 
         // Set the class name
-        replaceList.Add("name", table.ClassName); // TODO: Class name muss noch gecheckt werden! Wegen zahlen, leerzeichen, etc.
+        var className = GenerateClassName(table.ClassName);
+        replaceList.Add(new ReplacementDto("name", className));
 
         // Set the "inherits" value of the community toolkit.
         var inheritValue = string.Empty;
         if (options.AddSetProperty)
         {
-            template = template.Insert(0, $"using CommunityToolkit.Mvvm.ComponentModel;{Environment.NewLine}");
+            template.Insert(0, $"using CommunityToolkit.Mvvm.ComponentModel;");
             inheritValue = ": ObservableObject";
         }
 
-        replaceList.Add("inherits", inheritValue);
+        replaceList.Add(new ReplacementDto("inherits", inheritValue));
 
         // Get the attributes
-        replaceList.Add("attributes", GetClassAttributes(options, table));
+        replaceList.Add(new ReplacementDto("attributes", GetClassAttributes(options, table)));
 
-        // Replace the values
-        var result = ReplaceValues(template, replaceList);
+        // Finalize the template and inject the values.
+        var result = FinalizeTemplate(template, replaceList);
 
-        await File.WriteAllTextAsync(@"C:\Users\Anwender\Desktop\TestClass.cs", result);
+        // Save the generated class.
+        var path = Path.Combine(options.Output, $"{className}.cs");
+        await File.WriteAllTextAsync(path, result);
     }
 
     /// <summary>
@@ -104,15 +114,7 @@ public partial class ClassManager
                 : $"[Table(\"{table.Name}\", Schema = \"{table.Schema}\"]");
         }
 
-        
-        var sb = new StringBuilder();
-
-        foreach (var attribute in attributes.OrderBy(o => o.Key))
-        {
-            sb.AppendLine(attribute.Value);
-        }
-
-        return sb.ToString();
+        return string.Join(Environment.NewLine, attributes.OrderBy(o => o.Key).Select(s => s.Value));
     }
 
     /// <summary>
@@ -122,34 +124,81 @@ public partial class ClassManager
     /// <param name="template">The property template.</param>
     /// <param name="column">The column.</param>
     /// <returns>The property content.</returns>
-    private string GeneratePropertyCode(ClassGeneratorOptions options, string template, ColumnEntry column)
+    private string GeneratePropertyCode(ClassGeneratorOptions options, List<string> template, ColumnEntry column)
     {
         // The list with the replacement values
         // Note: Before replacing, the keys are converted accordingly (capitalised with a leading and trailing dollar sign).
-        var replaceList = new SortedList<string, string>();
+        var replaceList = new List<ReplacementDto>();
 
         // Get the C# type
         var dataType = GetCSharpType(column.DataType);
 
+        // Prepare the template
+        var tmpTemplate = template.ToList(); // We nee a "copy" of the original template.
+        PrepareTemplate(tmpTemplate, dataType);
+
         // Set the type
-        replaceList.Add("type", dataType);
+        replaceList.Add(new ReplacementDto("type", dataType));
 
         // Set the nullable value
-        replaceList.Add("nullable", column.IsNullable ? "?" : "");
+        replaceList.Add(new ReplacementDto("nullable", column.IsNullable ? "?" : ""));
 
+        var tmpName = GeneratePropertyName(column.PropertyName);
         // Set the name of the property
-        replaceList.Add("name", column.PropertyName);
+        replaceList.Add(new ReplacementDto("name", tmpName));
 
         // Add the backing field name
-        replaceList.Add("name2", $"_{column.PropertyName.FirstCharToLower()}");
+        replaceList.Add(new ReplacementDto("name2", $"_{tmpName.FirstCharToLower()}"));
 
         // Get the attributes
-        replaceList.Add("attributes", GetPropertyAttributes(options, column, dataType));
+        replaceList.Add(new ReplacementDto("attributes", GetPropertyAttributes(options, column, dataType)));
 
-        // Replace the values
-        var result = ReplaceValues(template, replaceList);
+        // Finalize the template and inject the values.
+        return FinalizeTemplate(tmpTemplate, replaceList);
+    }
 
-        return CleanContent(result, Tab);
+    /// <summary>
+    /// Prepares the template to add the initialization of a string (<c>= string.Empty;</c>).
+    /// </summary>
+    /// <param name="template">The template.</param>
+    /// <param name="dataType">The data type.</param>
+    private static void PrepareTemplate(List<string> template, string dataType)
+    {
+        const string variablePlaceholder = "$NAME2$";
+        const string propertyPlaceholder = "$NAME$";
+
+        if (!dataType.Equals("string", StringComparison.InvariantCultureIgnoreCase))
+            return;
+
+        if (template.Any(a => a.Contains(variablePlaceholder)))
+        {
+            var index = GetLineIndex(template, variablePlaceholder);
+            if (index == -1)
+                return;
+
+            template[index] = template[index].Replace(";", " = string.Empty;");
+        }
+        else if (template.Any(a => a.Contains(propertyPlaceholder)))
+        {
+            var index = GetLineIndex(template, propertyPlaceholder);
+            if (index == -1)
+                return;
+
+            template[index] += " = string.Empty;";
+        }
+
+        return;
+
+        static int GetLineIndex(IReadOnlyList<string> lines, string value)
+        {
+            for (var i = 0; i < lines.Count; i++)
+            {
+                if (lines[i].Contains(value))
+                    return i;
+            }
+
+            return -1;
+        }
     }
 
     /// <summary>
@@ -184,13 +233,6 @@ public partial class ClassManager
                 : $"[MaxLength({column.MaxLength})]");
         }
 
-        var sb = new StringBuilder();
-
-        foreach (var attribute in attributes.OrderBy(o => o.Key))
-        {
-            sb.AppendLine(attribute.Value);
-        }
-
-        return sb.ToString();
+        return string.Join(Environment.NewLine, attributes.OrderBy(o => o.Key).Select(s => s.Value));
     }
 }

@@ -7,4 +7,4 @@ namespace MsSql.ClassGenerator.Core.Model;
 /// </summary>
 /// <param name="Type">The type of the template.</param>
 /// <param name="Content">The content.</param>
-public sealed record TemplateDto(TemplateType Type, string Content);
+public sealed record TemplateDto(TemplateType Type, List<string> Content);

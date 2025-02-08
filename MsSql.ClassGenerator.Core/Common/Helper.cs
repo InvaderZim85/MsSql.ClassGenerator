@@ -60,4 +60,19 @@ public static class Helper
 
         return JsonConvert.DeserializeObject<T>(content) ?? new T();
     }
+
+    /// <summary>
+    /// Gets the list with the modifier
+    /// </summary>
+    /// <returns>The list with the modifier</returns>
+    public static List<string> GetModifierList()
+    {
+        return
+        [
+            "public",
+            "internal",
+            "protected",
+            "protected internal"
+        ];
+    }
 }
