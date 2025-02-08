@@ -34,7 +34,7 @@
             <Style x:Key="ItemKey" TargetType="{x:Type Label}">
                 <Setter Property="VerticalAlignment" Value="Center" />
                 <Setter Property="HorizontalAlignment" Value="Right" />
-                <Setter Property="FontWeight" Value="Bold" />
+                <Setter Property="FontWeight" Value="DemiBold" />
             </Style>
 
             <Style x:Key="ItemValue" TargetType="{x:Type Label}">

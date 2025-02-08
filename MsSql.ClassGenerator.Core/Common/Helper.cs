@@ -62,6 +62,21 @@ public static class Helper
     }
 
     /// <summary>
+    /// Converts the data info a JSON formatted string and writes the string into the desired file.
+    /// </summary>
+    /// <param name="data">The data which should be saved.</param>
+    /// <param name="filepath">The path of the file.</param>
+    /// <returns>The awaitable task.</returns>
+    public static async Task SaveJsonFileAsync(object data, string filepath)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(filepath);
+
+        var content = JsonConvert.SerializeObject(data, Formatting.Indented);
+
+        await File.WriteAllTextAsync(filepath, content);
+    }
+
+    /// <summary>
     /// Gets the list with the modifier
     /// </summary>
     /// <returns>The list with the modifier</returns>

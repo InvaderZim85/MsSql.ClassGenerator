@@ -34,7 +34,7 @@ public sealed class TableManager(string server, string database)
     /// </summary>
     /// <param name="filter">The desired filter.</param>
     /// <returns>The awaitable task.</returns>
-    public async Task LoadTablesAsync(string filter)
+    public async Task LoadTablesAsync(string filter = "")
     {
         Log.Debug("Load tables. Filter: '{filter}'", filter);
         ProgressEvent?.Invoke(this, "Load tables...");

@@ -3,7 +3,7 @@
 /// <summary>
 /// Represents a column.
 /// </summary>
-public sealed class ColumnEntry
+public class ColumnEntry
 {
     /// <summary>
     /// Gets or sets the table id.
