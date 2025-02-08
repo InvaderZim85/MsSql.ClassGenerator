@@ -6,12 +6,14 @@
 version: 2
 updates:
   - package-ecosystem: "nuget" # See documentation for possible values
-    directory: "/" # Location of package manifests
+    directories: 
+      - "/MsSql.ClassGenerator.Cli" # Console application
+      - "/MsSql.ClassGenerator" # WPF project
+      - "/MsSql.ClassGenerator.Core" # Core project
     schedule:
       interval: "weekly"
     assignees: 
       - "InvaderZim85"
-    open-pull-requests-limit: 5,
     labels:
       - "nuget"
       - "dependencies"
