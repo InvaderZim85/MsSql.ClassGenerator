@@ -10,11 +10,6 @@ namespace MsSql.ClassGenerator.Core.Business;
 public sealed partial class ClassManager
 {
     /// <summary>
-    /// The name of the default class modifier.
-    /// </summary>
-    private const string ModifierFallback = "public";
-
-    /// <summary>
     /// Contains the tab indent.
     /// </summary>
     private static readonly string Tab = new(' ', 4);
@@ -100,7 +95,7 @@ public sealed partial class ClassManager
         // Load the content of the file
         var content = await File.ReadAllLinesAsync(templateFile.FullName);
 
-        return new TemplateDto(type, content.ToList());
+        return new TemplateDto(type, [..content]);
     }
 
     /// <summary>
