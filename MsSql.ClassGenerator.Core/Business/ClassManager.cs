@@ -1,5 +1,6 @@
 ﻿using MsSql.ClassGenerator.Core.Common;
 using MsSql.ClassGenerator.Core.Model;
+using Serilog;
 
 namespace MsSql.ClassGenerator.Core.Business;
 
@@ -25,6 +26,8 @@ public partial class ClassManager
         // Step 2: Load the tables which should be exported
         foreach (var table in tables)
         {
+            ProgressEvent?.Invoke(this, $"Generate class for table '{table.Name}'...");
+            Log.Debug("Generate class for table '{name}'...", table.Name);
             await GenerateClassAsync(options, table);
         }
     }

@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "MsSql.ClassGenerator.Cli": {
+      "commandName": "Project",
+      "commandLineArgs": "-s (localdb)\\MsSqlLocalDb -d CmsDev -o \"D:\\Dump\\ClassGenerator\" -n TestNameSpace -m public --sealed --db-model --table-name --summary -l 1"
+    }
+  }
+}
