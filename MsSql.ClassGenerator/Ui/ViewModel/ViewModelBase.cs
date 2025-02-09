@@ -1,9 +1,13 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using ControlzEx.Theming;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.WindowsAPICodePack.Taskbar;
 using Serilog;
 using System.Runtime.CompilerServices;
 using System.Windows;
+using System.Windows.Media;
+using MsSql.ClassGenerator.Business;
+using MsSql.ClassGenerator.Common;
 using Timer = System.Timers.Timer;
 
 namespace MsSql.ClassGenerator.Ui.ViewModel;
