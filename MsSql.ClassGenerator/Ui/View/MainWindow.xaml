@@ -338,11 +338,16 @@
                             <DataGridCheckBoxColumn Width="Auto" Binding="{Binding Use}" />
                             <DataGridTextColumn
                                 Width="*"
+                                Binding="{Binding Schema}"
+                                Header="Schema"
+                                IsReadOnly="True" />
+                            <DataGridTextColumn
+                                Width="2*"
                                 Binding="{Binding Name}"
                                 Header="Name"
                                 IsReadOnly="True" />
                             <DataGridTextColumn
-                                Width="*"
+                                Width="2*"
                                 Binding="{Binding Alias, UpdateSourceTrigger=PropertyChanged}"
                                 Header="Alias" />
                         </DataGrid.Columns>

@@ -14,6 +14,14 @@ public sealed partial class TableColumnDto : ObservableObject
     public int Id { get; set; }
 
     /// <summary>
+    /// Gets or sets the name of the schema.
+    /// </summary>
+    /// <remarks>
+    /// <b>Note</b>: Only needed for the tables.
+    /// </remarks>
+    public string Schema { get; set; } = string.Empty;
+
+    /// <summary>
     /// Gets or sets the name of the table.
     /// </summary>
     public string Name { get; set; }
@@ -68,6 +76,7 @@ public sealed partial class TableColumnDto : ObservableObject
     public TableColumnDto(TableEntry table)
     {
         Id = table.Id;
+        Schema = table.Schema;
         Name = table.Name;
         Alias = table.Alias;
         Columns = table.Columns.Select(s => new TableColumnDto(s)).ToList();

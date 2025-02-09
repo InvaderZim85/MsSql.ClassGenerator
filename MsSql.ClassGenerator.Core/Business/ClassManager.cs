@@ -116,11 +116,11 @@ public partial class ClassManager
         if (options.AddTableNameToClassSummary)
         {
             attributes.Add(1, "/// <remarks>");
-            attributes.Add(2, $"/// Table <c>{table.Name}</c>");
+            attributes.Add(2, $"/// Table <c>[{table.Schema}].[{table.Name}]</c>");
             attributes.Add(3, "/// </summary>");
         }
 
-        if (options.DbModel && !table.Name.Equals(table.ClassName))
+        if (options.DbModel)
         {
             attributes.Add(4, string.IsNullOrWhiteSpace(table.Schema)
                 ? $"[Table(\"{table.Name}\")]"
@@ -147,7 +147,7 @@ public partial class ClassManager
         var dataType = GetCSharpType(column.DataType);
 
         // Prepare the template
-        var tmpTemplate = template.ToList(); // We nee a "copy" of the original template.
+        var tmpTemplate = template.ToList(); // We need a "copy" of the original template.
         PrepareTemplate(tmpTemplate, dataType);
 
         // Set the type
