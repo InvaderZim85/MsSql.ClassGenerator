@@ -1,5 +1,6 @@
 ﻿using System.Windows;
-using MsSql.ClassGenerator.Model.Internal;
+using MsSql.ClassGenerator.Core.Common;
+using MsSql.ClassGenerator.Model;
 using MsSql.ClassGenerator.Ui.View;
 
 namespace MsSql.ClassGenerator;
@@ -17,7 +18,11 @@ public partial class App : Application
     /// <exception cref="NotImplementedException"></exception>
     private void App_OnStartup(object sender, StartupEventArgs e)
     {
-        var mainWindow = new MainWindow(new Arguments());
+        e.Args.ExtractArguments(out Arguments arguments);
+
+        Helper.InitLog(arguments.LogLevel, false);
+
+        var mainWindow = new MainWindow(arguments);
         mainWindow.Show();
     }
 }

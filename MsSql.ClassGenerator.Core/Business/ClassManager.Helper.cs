@@ -291,7 +291,7 @@ public sealed partial class ClassManager
     /// </summary>
     /// <param name="includeUnderscore"><see langword="true"/> to include an underscore in the list, otherwise <see langword="false"/>.</param>
     /// <returns>The list with the values.</returns>
-    public static List<ReplacementDto> GetInvalidCharReplaceList(bool includeUnderscore = true)
+    private static List<ReplacementDto> GetInvalidCharReplaceList(bool includeUnderscore = true)
     {
         var tmpList = new List<ReplacementDto>
         {
@@ -309,6 +309,20 @@ public sealed partial class ClassManager
             tmpList.Add(new ReplacementDto("_", ""));
 
         return tmpList;
+    }
+
+    /// <summary>
+    /// Cleans the directory and deletes all existing <c>*.cs</c> files.
+    /// </summary>
+    /// <param name="path">The path of the desired directory.</param>
+    private static void CleanDirectory(string path)
+    {
+        var files = Directory.GetFiles(path, "*.cs", SearchOption.TopDirectoryOnly);
+
+        foreach (var file in files)
+        {
+            File.Delete(file);
+        }
     }
     #endregion
 }

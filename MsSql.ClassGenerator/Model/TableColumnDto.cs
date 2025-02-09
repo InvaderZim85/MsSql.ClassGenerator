@@ -16,7 +16,7 @@ public sealed partial class TableColumnDto : ObservableObject
     /// <summary>
     /// Gets or sets the name of the table.
     /// </summary>
-    public string Name { get; set; } = string.Empty;
+    public string Name { get; set; }
 
     /// <summary>
     /// Gets or sets the alias.
@@ -45,7 +45,8 @@ public sealed partial class TableColumnDto : ObservableObject
     /// <summary>
     /// Gets or sets the value which indicates whether the table should be used for the export.
     /// </summary>
-    public bool Use { get; set; }
+    [ObservableProperty]
+    private bool _use = true;
 
     /// <summary>
     /// Gets or sets the original item (table / column)
@@ -61,11 +62,6 @@ public sealed partial class TableColumnDto : ObservableObject
     public List<TableColumnDto> Columns { get; set; } = [];
 
     /// <summary>
-    /// Creates a new, empty instance.
-    /// </summary>
-    public TableColumnDto(){ }
-
-    /// <summary>
     /// Creates a new table instance.
     /// </summary>
     /// <param name="table">The source table.</param>
@@ -76,6 +72,7 @@ public sealed partial class TableColumnDto : ObservableObject
         Alias = table.Alias;
         Columns = table.Columns.Select(s => new TableColumnDto(s)).ToList();
         Use = true;
+        OriginalItem = table;
     }
 
     /// <summary>
@@ -88,5 +85,6 @@ public sealed partial class TableColumnDto : ObservableObject
         Alias = column.Alias;
         Position = column.Order;
         Use = true;
+        OriginalItem = column;
     }
 }

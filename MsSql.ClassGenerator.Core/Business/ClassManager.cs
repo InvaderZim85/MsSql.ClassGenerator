@@ -14,11 +14,21 @@ public partial class ClassManager
     /// </summary>
     public event EventHandler<string>? ProgressEvent; 
 
+    /// <summary>
+    /// Generates the classes out of the specified tables according to the specified options.
+    /// </summary>
+    /// <param name="options">The options.</param>
+    /// <param name="tables">The list with the tables.</param>
+    /// <returns>The awaitable task.</returns>
+    /// <exception cref="DirectoryNotFoundException">Will be thrown when the specified output directory doesn't exist.</exception>
     public async Task GenerateClassAsync(ClassGeneratorOptions options, List<TableEntry> tables)
     {
         // Step 0: Check the options.
         if (!Directory.Exists(options.Output))
             throw new DirectoryNotFoundException($"The specified output ({options.Output}) folder doesn't exist.");
+
+        if (options.EmptyOutputDirectoryBeforeExport)
+            CleanDirectory(options.Output);
 
         // Step 1: Load the type conversion information (needed for the class generator).
         await LoadTypeConversionDataAsync();

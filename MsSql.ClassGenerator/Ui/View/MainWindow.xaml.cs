@@ -1,5 +1,5 @@
 ﻿using MahApps.Metro.Controls;
-using MsSql.ClassGenerator.Model.Internal;
+using MsSql.ClassGenerator.Model;
 using MsSql.ClassGenerator.Ui.ViewModel;
 using System.Windows;
 

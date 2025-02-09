@@ -3,12 +3,13 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:enums="clr-namespace:MsSql.ClassGenerator.Common.Enums"
     xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
     xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:view="clr-namespace:MsSql.ClassGenerator.Ui.View"
     xmlns:viewModel="clr-namespace:MsSql.ClassGenerator.Ui.ViewModel"
-    Title="MsSql.ClassGenerator"
+    Title="{Binding AppTitle}"
     Width="1200"
     Height="800"
     mah:DialogParticipation.Register="{Binding}"
@@ -49,13 +50,14 @@
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
                     <view:HeadlineControl
                         Grid.Row="0"
                         Grid.Column="0"
-                        Grid.ColumnSpan="6"
+                        Grid.ColumnSpan="7"
                         HeadlineText="Connection"
                         IconKind="AngleDoubleRight" />
 
@@ -73,15 +75,14 @@
                         Grid.Row="1"
                         Grid.Column="2"
                         Width="75"
-                        HorizontalAlignment="Left"
                         Command="{Binding ConnectCommand}"
                         Content="Connect" />
                     <Button
                         Grid.Row="1"
                         Grid.Column="3"
                         Width="30"
-                        HorizontalAlignment="Left"
-                        Command="{Binding AddConnectionCommand}">
+                        Command="{Binding AddConnectionCommand}"
+                        ToolTip="Creates a new connection.">
                         <Button.Content>
                             <iconPacks:PackIconForkAwesome Kind="Plus" />
                         </Button.Content>
@@ -90,10 +91,20 @@
                         Grid.Row="1"
                         Grid.Column="4"
                         Width="30"
-                        HorizontalAlignment="Left"
-                        Command="{Binding EditConnectionCommand}">
+                        Command="{Binding EditConnectionCommand}"
+                        ToolTip="Edits the currently selected connection.">
                         <Button.Content>
                             <iconPacks:PackIconForkAwesome Kind="Pencil" />
+                        </Button.Content>
+                    </Button>
+                    <Button
+                        Grid.Row="1"
+                        Grid.Column="5"
+                        Width="30"
+                        Command="{Binding DeleteConnectionCommand}"
+                        ToolTip="Deletes the currently selected connection.">
+                        <Button.Content>
+                            <iconPacks:PackIconForkAwesome Kind="Trash" />
                         </Button.Content>
                     </Button>
 
@@ -111,14 +122,16 @@
                         Grid.Row="2"
                         Grid.Column="2"
                         Width="75"
-                        HorizontalAlignment="Left"
                         Command="{Binding SelectCommand}"
                         Content="Select" />
                 </Grid>
             </Border>
 
             <!--  Options  -->
-            <Border Grid.Row="1" Style="{StaticResource BorderStyle}">
+            <Border
+                Grid.Row="1"
+                IsEnabled="{Binding IsConnected}"
+                Style="{StaticResource BorderStyle}">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="34" />
@@ -256,13 +269,18 @@
             </Border>
 
             <!--  Data  -->
-            <Border Grid.Row="2" Style="{StaticResource BorderStyle}">
+            <Border
+                Grid.Row="2"
+                IsEnabled="{Binding IsConnected}"
+                Style="{StaticResource BorderStyle}">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
                     <Grid.ColumnDefinitions>
@@ -293,12 +311,22 @@
                     <TextBox
                         Grid.Row="2"
                         Grid.Column="0"
-                        Style="{StaticResource TextBoxFilter}" />
+                        Style="{StaticResource TextBoxFilter}"
+                        Text="{Binding FilterTable, UpdateSourceTrigger=PropertyChanged}">
+                        <TextBox.InputBindings>
+                            <KeyBinding Key="Enter" Command="{Binding FilterTablesCommand}" />
+                        </TextBox.InputBindings>
+                    </TextBox>
 
                     <TextBox
                         Grid.Row="2"
                         Grid.Column="1"
-                        Style="{StaticResource TextBoxFilter}" />
+                        Style="{StaticResource TextBoxFilter}"
+                        Text="{Binding FilterColumn, UpdateSourceTrigger=PropertyChanged}">
+                        <TextBox.InputBindings>
+                            <KeyBinding Key="Enter" Command="{Binding FilterColumnsCommand}" />
+                        </TextBox.InputBindings>
+                    </TextBox>
 
                     <!--  Grids  -->
                     <DataGrid
@@ -337,12 +365,54 @@
                                 Header="Alias" />
                         </DataGrid.Columns>
                     </DataGrid>
+
+                    <Separator
+                        Grid.Row="4"
+                        Grid.Column="0"
+                        Grid.ColumnSpan="2" />
+
+                    <StackPanel
+                        Grid.Row="5"
+                        Grid.Column="0"
+                        Orientation="Horizontal">
+                        <Button
+                            Width="80"
+                            Command="{Binding SetTableSelectionCommand}"
+                            CommandParameter="{x:Static enums:SelectionType.All}"
+                            Content="Select all" />
+                        <Button
+                            Width="80"
+                            Command="{Binding SetTableSelectionCommand}"
+                            CommandParameter="{x:Static enums:SelectionType.None}"
+                            Content="Select none" />
+                    </StackPanel>
+
+                    <StackPanel
+                        Grid.Row="5"
+                        Grid.Column="1"
+                        Orientation="Horizontal">
+                        <Button
+                            Width="80"
+                            Command="{Binding SetColumnSelectionCommand}"
+                            CommandParameter="{x:Static enums:SelectionType.All}"
+                            Content="Select all" />
+                        <Button
+                            Width="80"
+                            Command="{Binding SetColumnSelectionCommand}"
+                            CommandParameter="{x:Static enums:SelectionType.None}"
+                            Content="Select none" />
+                    </StackPanel>
                 </Grid>
             </Border>
 
-            <StackPanel Grid.Row="3" Orientation="Horizontal">
-                <Button Width="75" Content="Reset" />
-                <Button Width="75" Content="Create" />
+            <StackPanel
+                Grid.Row="3"
+                IsEnabled="{Binding IsConnected}"
+                Orientation="Horizontal">
+                <Button
+                    Width="75"
+                    Command="{Binding GenerateClassesCommand}"
+                    Content="Create" />
             </StackPanel>
         </Grid>
     </DockPanel>

@@ -6,6 +6,11 @@
 public sealed class ServerEntry
 {
     /// <summary>
+    /// Gets or sets the unique id of the server.
+    /// </summary>
+    public Guid Id { get; set; }
+
+    /// <summary>
     /// Gets or sets the name of the server.
     /// </summary>
     public string Name { get; set; } = string.Empty;
