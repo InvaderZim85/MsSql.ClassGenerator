@@ -1,22 +1,26 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net9.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+    <Version>25.40.0.893</Version>
+    <FileVersion>25.40.0.893</FileVersion>
+    <AssemblyVersion>25.40.0.893</AssemblyVersion>
+    <PlatformTarget>x64</PlatformTarget>
+    <ApplicationIcon>icon.ico</ApplicationIcon>
   </PropertyGroup>
-
+  <ItemGroup>
+    <Resource Include="icon.ico" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     <PackageReference Include="MahApps.Metro" Version="2.4.10" />
     <PackageReference Include="MahApps.Metro.IconPacks.ForkAwesome" Version="5.1.0" />
     <PackageReference Include="Microsoft-WindowsAPICodePack-Shell" Version="1.1.5" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\MsSql.ClassGenerator.Core\MsSql.ClassGenerator.Core.csproj" />
   </ItemGroup>
-
 </Project>

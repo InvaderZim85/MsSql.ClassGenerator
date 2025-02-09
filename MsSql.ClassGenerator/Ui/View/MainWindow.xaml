@@ -13,6 +13,7 @@
     Width="1200"
     Height="800"
     mah:DialogParticipation.Register="{Binding}"
+    Icon="../../icon.ico"
     Loaded="MainWindow_OnLoaded"
     ResizeMode="CanResizeWithGrip"
     TitleCharacterCasing="Normal"
@@ -297,14 +298,14 @@
                     <view:HeadlineControl
                         Grid.Row="1"
                         Grid.Column="0"
-                        HeadlineText="Tables"
+                        HeadlineText="{Binding HeaderTables}"
                         TextFont="DemiBold"
                         TextStyle="Italic" />
 
                     <view:HeadlineControl
                         Grid.Row="1"
                         Grid.Column="1"
-                        HeadlineText="Columns"
+                        HeadlineText="{Binding HeaderColumns}"
                         TextFont="DemiBold"
                         TextStyle="Italic" />
 
@@ -415,9 +416,9 @@
                 IsEnabled="{Binding IsConnected}"
                 Orientation="Horizontal">
                 <Button
-                    Width="75"
+                    Width="170"
                     Command="{Binding GenerateClassesCommand}"
-                    Content="Create" />
+                    Content="Create classes" />
             </StackPanel>
         </Grid>
     </DockPanel>

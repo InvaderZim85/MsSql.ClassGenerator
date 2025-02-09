@@ -228,6 +228,18 @@ internal sealed partial class MainWindowViewModel : ViewModelBase
         if (string.IsNullOrWhiteSpace(value))
             FilterColumns();
     }
+
+    /// <summary>
+    /// Gets or sets the table header.
+    /// </summary>
+    [ObservableProperty]
+    private string _headerTables = "Tables";
+
+    /// <summary>
+    /// Gets or sets the column header.
+    /// </summary>
+    [ObservableProperty]
+    private string _headerColumns = "Columns";
     #endregion
 
     #region Behaviour / Various
@@ -564,6 +576,8 @@ internal sealed partial class MainWindowViewModel : ViewModelBase
         Tables = FilterValues(_originTables, FilterTable);
 
         SelectedTable = Tables.FirstOrDefault();
+
+        HeaderTables = Tables.Count == 1 ? "1 Table" : $"{Tables.Count} Tables";
     }
 
     /// <summary>
@@ -576,6 +590,8 @@ internal sealed partial class MainWindowViewModel : ViewModelBase
     private void FilterColumns()
     {
         Columns = FilterValues(_originColumns, FilterColumn);
+
+        HeaderColumns = Columns.Count == 1 ? "1 Column" : $"{Columns.Count} Columns";
     }
 
     /// <summary>
@@ -588,7 +604,9 @@ internal sealed partial class MainWindowViewModel : ViewModelBase
     {
         return string.IsNullOrWhiteSpace(filter)
             ? source.ToObservableCollection()
-            : source.Where(w => w.Name.Contains(filter, StringComparison.InvariantCultureIgnoreCase))
+            : source.Where(w => w.Name.Contains(filter, StringComparison.InvariantCultureIgnoreCase) ||
+                                (!string.IsNullOrWhiteSpace(w.Schema) && w.Schema.Contains(filter,
+                                    StringComparison.InvariantCultureIgnoreCase)))
                 .ToObservableCollection();
     }
     #endregion
