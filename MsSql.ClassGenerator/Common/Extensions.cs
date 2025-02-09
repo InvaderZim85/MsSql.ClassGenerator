@@ -1,6 +1,7 @@
 ﻿using MsSql.ClassGenerator.Core.Model;
 using MsSql.ClassGenerator.Model;
 using System.Collections.ObjectModel;
+using System.Windows.Media;
 
 namespace MsSql.ClassGenerator.Common;
 
@@ -63,5 +64,15 @@ internal static class Extensions
         }
 
         return result;
+    }
+
+    /// <summary>
+    /// Converts the color to a HEX value (for example <i>Green</i> > <c>#FF00FF00</c>)
+    /// </summary>
+    /// <param name="color">The color</param>
+    /// <returns>The HEX value of the color</returns>
+    public static string ToHex(this Color color)
+    {
+        return $"#{color.A:X2}{color.R:X2}{color.G:X2}{color.B:X2}";
     }
 }

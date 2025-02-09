@@ -1,7 +1,10 @@
-﻿using System.Windows;
-using MsSql.ClassGenerator.Core.Common;
+﻿using MsSql.ClassGenerator.Core.Common;
 using MsSql.ClassGenerator.Model;
+using MsSql.ClassGenerator.Properties;
+using MsSql.ClassGenerator.Ui;
 using MsSql.ClassGenerator.Ui.View;
+using Serilog;
+using System.Windows;
 
 namespace MsSql.ClassGenerator;
 
@@ -16,13 +19,26 @@ public partial class App : Application
     /// <param name="sender">The <see cref="App"/>.</param>
     /// <param name="e">The event arguments.</param>
     /// <exception cref="NotImplementedException"></exception>
-    private void App_OnStartup(object sender, StartupEventArgs e)
+    private async void App_OnStartup(object sender, StartupEventArgs e)
     {
-        e.Args.ExtractArguments(out Arguments arguments);
+        try
+        {
+            // Extract the arguments
+            e.Args.ExtractArguments(out Arguments arguments);
 
-        Helper.InitLog(arguments.LogLevel, false);
+            // Init the logger.
+            Helper.InitLog(arguments.LogLevel, false);
 
-        var mainWindow = new MainWindow(arguments);
-        mainWindow.Show();
+            // Show the window.
+            var mainWindow = new MainWindow(arguments);
+            mainWindow.Show();
+
+            // Set the color scheme
+            await UiHelper.SetColorThemeAsync(Settings.Default.UiColor);
+        }
+        catch (Exception ex)
+        {
+            Log.Fatal(ex, "A fatal error has occurred.");
+        }
     }
 }
