@@ -412,9 +412,7 @@ internal sealed partial class MainWindowViewModel : ViewModelBase
             await _tableManager.LoadTablesAsync();
 
             // Set the tables
-            _originTables = _tableManager.Tables
-                .Select(s => new TableColumnDto(s))
-                .OrderBy(o => o.Name).ToList();
+            _originTables = [.._tableManager.Tables.Select(s => new TableColumnDto(s)).OrderBy(o => o.Name)];
             
             FilterTables();
 
@@ -488,7 +486,7 @@ internal sealed partial class MainWindowViewModel : ViewModelBase
         try
         {
             // Update the server list
-            await SettingsManager.SaveServerListAsync(ServerList.ToList());
+            await SettingsManager.SaveServerListAsync([..ServerList]);
         }
         catch (Exception ex)
         {
