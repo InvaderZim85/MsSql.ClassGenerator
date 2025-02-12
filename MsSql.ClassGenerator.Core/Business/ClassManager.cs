@@ -117,14 +117,14 @@ public partial class ClassManager
         {
             attributes.Add(1, "/// <remarks>");
             attributes.Add(2, $"/// Table <c>[{table.Schema}].[{table.Name}]</c>");
-            attributes.Add(3, "/// </summary>");
+            attributes.Add(3, "/// </remarks>");
         }
 
         if (options.DbModel)
         {
             attributes.Add(4, string.IsNullOrWhiteSpace(table.Schema)
                 ? $"[Table(\"{table.Name}\")]"
-                : $"[Table(\"{table.Name}\", Schema = \"{table.Schema}\"]");
+                : $"[Table(\"{table.Name}\", Schema = \"{table.Schema}\")]");
         }
 
         return string.Join(Environment.NewLine, attributes.OrderBy(o => o.Key).Select(s => s.Value));
