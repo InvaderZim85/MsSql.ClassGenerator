@@ -1,13 +1,13 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net9.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
-    <Version>25.40.0.893</Version>
-    <FileVersion>25.40.0.893</FileVersion>
-    <AssemblyVersion>25.40.0.893</AssemblyVersion>
+    <Version>25.43.0.756</Version>
+    <FileVersion>25.43.0.756</FileVersion>
+    <AssemblyVersion>25.43.0.756</AssemblyVersion>
     <PlatformTarget>x64</PlatformTarget>
     <ApplicationIcon>icon.ico</ApplicationIcon>
   </PropertyGroup>

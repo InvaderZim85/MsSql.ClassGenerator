@@ -4,9 +4,9 @@
     <TargetFramework>net9.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <Version>25.40.0.893</Version>
-    <FileVersion>25.40.0.893</FileVersion>
-    <AssemblyVersion>25.40.0.893</AssemblyVersion>
+    <Version>25.43.0.756</Version>
+    <FileVersion>25.43.0.756</FileVersion>
+    <AssemblyVersion>25.43.0.756</AssemblyVersion>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\MsSql.ClassGenerator.Core\MsSql.ClassGenerator.Core.csproj" />
