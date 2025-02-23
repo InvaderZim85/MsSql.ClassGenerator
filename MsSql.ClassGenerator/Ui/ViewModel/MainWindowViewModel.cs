@@ -630,9 +630,9 @@ internal sealed partial class MainWindowViewModel : ViewModelBase
     {
         var tmpList = string.IsNullOrWhiteSpace(filter)
             ? source
-            : source.Where(w => w.Name.Contains(filter, StringComparison.InvariantCultureIgnoreCase) ||
+            : [.. source.Where(w => w.Name.Contains(filter, StringComparison.InvariantCultureIgnoreCase) ||
                                 (!string.IsNullOrWhiteSpace(w.Schema) && w.Schema.Contains(filter,
-                                    StringComparison.InvariantCultureIgnoreCase))).ToList();
+                                    StringComparison.InvariantCultureIgnoreCase)))];
 
         return tmpList.FirstOrDefault()?.Type == EntryType.Table
             ? tmpList.OrderBy(o => o.Name).ToObservableCollection()

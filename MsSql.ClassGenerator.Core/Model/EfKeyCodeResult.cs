@@ -8,7 +8,7 @@ public sealed class EfKeyCodeResult
     /// <summary>
     /// Gets the code.
     /// </summary>
-    public string Code { get; init; }
+    public string Code { get; init; } = string.Empty;
 
     /// <summary>
     /// Gets the amount of tables which contains multiple keys.
