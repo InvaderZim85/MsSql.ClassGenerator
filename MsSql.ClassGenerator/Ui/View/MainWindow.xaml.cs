@@ -2,6 +2,8 @@
 using MsSql.ClassGenerator.Model;
 using MsSql.ClassGenerator.Ui.ViewModel;
 using System.Windows;
+using Microsoft.VisualStudio.Threading;
+using Serilog;
 
 namespace MsSql.ClassGenerator.Ui.View;
 /// <summary>
@@ -32,7 +34,14 @@ public partial class MainWindow : MetroWindow
     /// <param name="e">The event arguments.</param>
     private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
     {
-        if (DataContext is MainWindowViewModel viewModel)
-            viewModel.InitViewModel(_arguments);
+        try
+        {
+            if (DataContext is MainWindowViewModel viewModel)
+                viewModel.InitViewModelAsync(_arguments).Forget();
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Error while initializing the main window.");
+        }
     }
 }
