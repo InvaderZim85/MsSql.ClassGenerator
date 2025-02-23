@@ -23,6 +23,15 @@
         <viewModel:MainWindowViewModel />
     </Window.DataContext>
 
+    <mah:MetroWindow.RightWindowCommands>
+        <mah:WindowCommands>
+            <Button
+                Command="{Binding OpenGitHubPageCommand}"
+                Content="{Binding UpdateInfo}"
+                Visibility="{Binding ButtonUpdateVisibility}" />
+        </mah:WindowCommands>
+    </mah:MetroWindow.RightWindowCommands>
+
     <DockPanel LastChildFill="True">
         <StatusBar DockPanel.Dock="Bottom">
             <StatusBarItem Content="{Binding Info}" />

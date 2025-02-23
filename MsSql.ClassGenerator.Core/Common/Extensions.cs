@@ -118,4 +118,24 @@ public static class Extensions
     {
         return !string.IsNullOrWhiteSpace(value) && int.TryParse(value[0].ToString(), out _);
     }
+
+    /// <summary>
+    /// Converts the value into a readable size
+    /// </summary>
+    /// <param name="value">The value</param>
+    /// <param name="divider">The divider (optional)</param>
+    /// <returns>The converted size</returns>
+    public static string ConvertSize(this long value, int divider = 1024)
+    {
+        return value switch
+        {
+            _ when value < divider => $"{value:N0} Bytes",
+            _ when value >= divider && value < Math.Pow(divider, 2) => $"{value / divider:N2} KB",
+            _ when value >= Math.Pow(divider, 2) && value < Math.Pow(divider, 3) =>
+                $"{value / Math.Pow(divider, 2):N2} MB",
+            _ when value >= Math.Pow(divider, 3) && value <= Math.Pow(divider, 4) => $"{value / Math.Pow(divider, 3):N2} GB",
+            _ when value >= Math.Pow(divider, 4) => $"{value / Math.Pow(divider, 4)} TB",
+            _ => value.ToString("N0")
+        };
+    }
 }

@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MahApps.Metro.Controls.Dialogs;
+using Microsoft.VisualStudio.Threading;
 using Microsoft.Win32;
 using MsSql.ClassGenerator.Business;
 using MsSql.ClassGenerator.Common;
@@ -13,6 +14,7 @@ using MsSql.ClassGenerator.Model;
 using MsSql.ClassGenerator.Ui.View;
 using System.Collections.ObjectModel;
 using System.Reflection;
+using System.Windows;
 
 namespace MsSql.ClassGenerator.Ui.ViewModel;
 
@@ -280,6 +282,18 @@ internal sealed partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty]
     private string _versionInfo = "Version";
 
+    /// <summary>
+    /// Gets or sets the visibility of the update button.
+    /// </summary>
+    [ObservableProperty]
+    private Visibility _buttonUpdateVisibility = Visibility.Hidden;
+
+    /// <summary>
+    /// Gets or sets the update info.
+    /// </summary>
+    [ObservableProperty]
+    private string _updateInfo = "Update available!";
+
     #endregion
 
     #endregion
@@ -288,12 +302,18 @@ internal sealed partial class MainWindowViewModel : ViewModelBase
     /// Init the view model.
     /// </summary>
     /// <param name="arguments">The provided arguments.</param>
-    public async void InitViewModel(Arguments arguments)
+    /// <returns>The awaitable task.</returns>
+    public async Task InitViewModelAsync(Arguments arguments)
     {
         try
         {
             // Set the version
             VersionInfo = $"v{Assembly.GetExecutingAssembly().GetName().Version}";
+
+            // Start the update check
+            CheckUpdate();
+
+            // Load the data
             ModifierList = Helper.GetModifierList().ToObservableCollection();
             SelectedModifier = ModifierList.FirstOrDefault() ?? "public";
 
@@ -821,6 +841,21 @@ internal sealed partial class MainWindowViewModel : ViewModelBase
     }
     #endregion
 
+    #region Various
+
+    /// <summary>
+    /// Occurs when the user hits the update button (title bar).
+    /// </summary>
+    /// <remarks>
+    /// Opens the GitHub page with the latest version.
+    /// </remarks>
+    [RelayCommand]
+    private static void OpenGitHubPage()
+    {
+        Helper.OpenLink(UpdateHelper.GitHupUrl);
+    }
+    #endregion
+
     #endregion
 
     #region Various
@@ -852,5 +887,27 @@ internal sealed partial class MainWindowViewModel : ViewModelBase
         Columns.Clear();
         Tables.Clear();
     }
+
+    /// <summary>
+    /// Checks if a new version is available
+    /// </summary>
+    private void CheckUpdate()
+    {
+        // The "Forget()" method is used to let the async task run without waiting.
+        // More information: https://docs.microsoft.com/en-us/answers/questions/186037/taskrun-without-wait.html
+        // To use "Forget" you need the following nuget package: https://www.nuget.org/packages/Microsoft.VisualStudio.Threading/
+        UpdateHelper.LoadReleaseInfoAsync(SetReleaseInfo).Forget();
+    }
+
+    /// <summary>
+    /// Sets the release info and shows the update button
+    /// </summary>
+    /// <param name="releaseInfo">The infos of the latest release</param>
+    private void SetReleaseInfo(ReleaseInfo releaseInfo)
+    {
+        ButtonUpdateVisibility = !string.IsNullOrWhiteSpace(releaseInfo.Name) ? Visibility.Visible : Visibility.Hidden;
+        UpdateInfo = $"Update available! New version: v{releaseInfo.NewVersion}";
+    }
+
     #endregion
 }

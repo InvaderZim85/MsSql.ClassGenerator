@@ -1,11 +1,10 @@
-﻿using System.Diagnostics;
-using System.Reflection;
-using MsSql.ClassGenerator.Cli.Model;
+﻿using MsSql.ClassGenerator.Cli.Model;
 using MsSql.ClassGenerator.Core.Business;
 using MsSql.ClassGenerator.Core.Common;
 using MsSql.ClassGenerator.Core.Model;
 using Serilog;
-using Serilog.Events;
+using System.Diagnostics;
+using System.Reflection;
 
 namespace MsSql.ClassGenerator.Cli;
 
@@ -21,6 +20,8 @@ internal static class Program
     /// <returns>The awaitable task.</returns>
     private static async Task Main(string[] args)
     {
+        await CheckForUpdate();
+
         var argResult = args.ExtractArguments(out Arguments arguments);
 
         Helper.InitLog(arguments.LogLevel, true);
@@ -97,5 +98,34 @@ internal static class Program
 
         if (header)
             Log.Information("Version: {version}", Assembly.GetExecutingAssembly().GetName().Version);
+    }
+
+    /// <summary>
+    /// Checks if an update is available.
+    /// </summary>
+    /// <returns>The awaitable task.</returns>
+    private static async Task CheckForUpdate()
+    {
+        try
+        {
+            await UpdateHelper.LoadReleaseInfoAsync(releaseInfo =>
+            {
+                var updateMessage = $"Update available. New version: {releaseInfo.NewVersion}";
+                const string link = $"Link: {UpdateHelper.GitHupUrl}";
+
+                var maxLength = updateMessage.Length > link.Length ? updateMessage.Length : link.Length;
+
+                var line = "-".PadRight(maxLength + 2, '-'); // Add two for the spacer
+                Console.WriteLine($"+{line}+");
+                Console.WriteLine($"| {updateMessage.PadRight(maxLength, ' ')} |");
+                Console.WriteLine($"| {link.PadRight(maxLength, ' ')} |");
+                Console.WriteLine($"+{line}+");
+                Console.WriteLine();
+            });
+        }
+        catch
+        {
+            // Ignore
+        }
     }
 }

@@ -1,11 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net9.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <Version>25.43.0.756</Version>
-    <FileVersion>25.43.0.756</FileVersion>
-    <AssemblyVersion>25.43.0.756</AssemblyVersion>
+    <Version>24.43.0.756</Version>
+    <FileVersion>24.43.0.756</FileVersion>
+    <AssemblyVersion>24.43.0.756</AssemblyVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="CommandLineParser" Version="2.9.1" />
@@ -14,6 +14,8 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
+    <PackageReference Include="RestSharp" Version="112.1.0" />
+    <PackageReference Include="RestSharp.Serializers.NewtonsoftJson" Version="112.1.0" />
   </ItemGroup>
   <ItemGroup>
     <None Update="Files\ClassDefaultWithNs.cgt">

@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Serilog;
 using Serilog.Events;
+using System.Diagnostics;
 
 namespace MsSql.ClassGenerator.Core.Common;
 
@@ -89,5 +90,22 @@ public static class Helper
             "protected",
             "protected internal"
         ];
+    }
+
+    /// <summary>
+    /// Opens the specified link
+    /// </summary>
+    /// <param name="url">The url of the link</param>
+    public static void OpenLink(string url)
+    {
+        try
+        {
+            url = url.Replace("&", "^&");
+            Process.Start(new ProcessStartInfo("cmd", $"/c start {url}") { CreateNoWindow = true });
+        }
+        catch
+        {
+            // Ignore
+        }
     }
 }
