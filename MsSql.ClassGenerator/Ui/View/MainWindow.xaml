@@ -25,7 +25,11 @@
 
     <DockPanel LastChildFill="True">
         <StatusBar DockPanel.Dock="Bottom">
-            <StatusBarItem Content="INFO" />
+            <StatusBarItem Content="{Binding Info}" />
+            <StatusBarItem
+                Margin="0,0,20,0"
+                HorizontalAlignment="Right"
+                Content="{Binding VersionInfo}" />
         </StatusBar>
 
         <Grid>
@@ -361,6 +365,22 @@
                         <DataGrid.Columns>
                             <DataGridCheckBoxColumn Width="Auto" Binding="{Binding Use}" />
                             <DataGridTextColumn
+                                Width="50"
+                                Binding="{Binding Position, StringFormat={}{0:N0}}"
+                                Header="Pos."
+                                IsReadOnly="True">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="HorizontalAlignment" Value="Center" />
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            <DataGridCheckBoxColumn
+                                Width="50"
+                                Binding="{Binding KeyColumn}"
+                                Header="Key"
+                                IsReadOnly="True" />
+                            <DataGridTextColumn
                                 Width="*"
                                 Binding="{Binding Name}"
                                 Header="Name"
@@ -419,6 +439,11 @@
                     Width="170"
                     Command="{Binding GenerateClassesCommand}"
                     Content="Create classes" />
+
+                <Button
+                    Command="{Binding ShowEfKeyCodeCommand}"
+                    Content="Show EF Key Code"
+                    IsEnabled="{Binding ButtonShowEfKeyCodeEnabled}" />
             </StackPanel>
         </Grid>
     </DockPanel>

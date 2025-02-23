@@ -1,4 +1,6 @@
-﻿using MsSql.ClassGenerator.Core.Common;
+﻿using System.Reflection.Emit;
+using System.Text;
+using MsSql.ClassGenerator.Core.Common;
 using MsSql.ClassGenerator.Core.Model;
 using Serilog;
 
@@ -12,7 +14,15 @@ public partial class ClassManager
     /// <summary>
     /// Occurs when progress was made.
     /// </summary>
-    public event EventHandler<string>? ProgressEvent; 
+    public event EventHandler<string>? ProgressEvent;
+
+    /// <summary>
+    /// Gets the EF Key code.
+    /// </summary>
+    /// <remarks>
+    /// <b>Note</b>: The code is only generated when the option <see cref="ClassGeneratorOptions.DbModel"/> is set to <see langword="true"/>.
+    /// </remarks>
+    public EfKeyCodeResult EfKeyCode { get; private set; } = new();
 
     /// <summary>
     /// Generates the classes out of the specified tables according to the specified options.
@@ -23,6 +33,8 @@ public partial class ClassManager
     /// <exception cref="DirectoryNotFoundException">Will be thrown when the specified output directory doesn't exist.</exception>
     public async Task GenerateClassAsync(ClassGeneratorOptions options, List<TableEntry> tables)
     {
+        EfKeyCode = new EfKeyCodeResult();
+
         // Step 0: Check the options.
         if (!Directory.Exists(options.Output))
             throw new DirectoryNotFoundException($"The specified output ({options.Output}) folder doesn't exist.");
@@ -40,6 +52,10 @@ public partial class ClassManager
             Log.Debug("Generate class for table '{name}'...", table.Name);
             await GenerateClassAsync(options, table);
         }
+
+        // Generate the EF Key code
+        if (options.DbModel)
+            GenerateEfKeyCode(tables);
     }
 
     /// <summary>
@@ -248,4 +264,70 @@ public partial class ClassManager
 
         return string.Join(Environment.NewLine, attributes.OrderBy(o => o.Key).Select(s => s.Value));
     }
+
+    /// <summary>
+    /// Generates the EF Key code.
+    /// </summary>
+    /// <param name="tables">The list with the tables.</param>
+    private void GenerateEfKeyCode(List<TableEntry> tables)
+    {
+        // Get all tables which contains more than one key column
+        var tmpTables = tables.Where(w => w.Columns.Count(c => c.IsPrimaryKey) > 1).ToList();
+        if (tmpTables.Count == 0)
+            return;
+
+        var sb = PrepareStringBuilder();
+        var count = 1;
+        foreach (var tableEntry in tmpTables)
+        {
+            // Add the entity
+            sb.AppendLine($"{Tab}modelBuilder.Entity<{tableEntry.ClassName}>().HasKey(k => new")
+                .AppendLine($"{Tab}{{");
+
+            // Get the key columns
+            var columnCount = 1;
+            var columns = tableEntry.Columns.Where(w => w.IsPrimaryKey).ToList();
+            foreach (var columnEntry in columns)
+            {
+                var comma = columnCount++ != columns.Count ? "," : string.Empty;
+
+                sb.AppendLine($"{Tab}{Tab}k.{columnEntry.PropertyName}{comma}");
+            }
+
+            // Add the closing brackets
+            sb.AppendLine($"{Tab}}});");
+
+            if (count++ != tmpTables.Count)
+                sb.AppendLine(); // Spacer
+
+        }
+
+        EfKeyCode = new EfKeyCodeResult
+        {
+            Code = FinalizeStringBuilder(),
+            TableCount = tmpTables.Count
+        };
+
+        return;
+
+        StringBuilder PrepareStringBuilder()
+        {
+            var stringBuilder = new StringBuilder()
+                .AppendLine("/// <inheritdoc />")
+                .AppendLine("protected override void OnModelCreating(ModelBuilder modelBuilder)")
+                .AppendLine("{");
+
+            return stringBuilder;
+        }
+
+        // Adds the final code
+        string FinalizeStringBuilder()
+        {
+            sb.AppendLine("}");
+
+            return sb.ToString();
+        }
+    }
+
+    
 }

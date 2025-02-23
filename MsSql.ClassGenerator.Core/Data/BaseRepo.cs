@@ -30,7 +30,7 @@ public class BaseRepo(string server, string database = "")
             DataSource = server,
             IntegratedSecurity = true,
             TrustServerCertificate = true,
-            ApplicationName = nameof(MsSql.ClassGenerator)
+            ApplicationName = nameof(ClassGenerator)
         };
 
         if (!string.IsNullOrWhiteSpace(database))

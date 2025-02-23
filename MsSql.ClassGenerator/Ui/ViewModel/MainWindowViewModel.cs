@@ -12,6 +12,7 @@ using MsSql.ClassGenerator.Core.Model;
 using MsSql.ClassGenerator.Model;
 using MsSql.ClassGenerator.Ui.View;
 using System.Collections.ObjectModel;
+using System.Reflection;
 
 namespace MsSql.ClassGenerator.Ui.ViewModel;
 
@@ -30,6 +31,11 @@ internal sealed partial class MainWindowViewModel : ViewModelBase
     /// The instance for the interaction with the tables.
     /// </summary>
     private TableManager? _tableManager;
+
+    /// <summary>
+    /// Contains the generated EF Key Code.
+    /// </summary>
+    private EfKeyCodeResult _efKeyCode = new();
 
     #endregion
 
@@ -256,6 +262,24 @@ internal sealed partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty]
     private string _appTitle = AppTitleDefault;
 
+    /// <summary>
+    /// Gets or sets the value which indicates whether the button "Show EF Key Code" should be enabled.
+    /// </summary>
+    [ObservableProperty]
+    private bool _buttonShowEfKeyCodeEnabled;
+
+    /// <summary>
+    /// Gets or sets the information (connection status).
+    /// </summary>
+    [ObservableProperty]
+    private string _info = "Not connected.";
+
+    /// <summary>
+    /// Gets or sets the version number.
+    /// </summary>
+    [ObservableProperty]
+    private string _versionInfo = "Version";
+
     #endregion
 
     #endregion
@@ -268,6 +292,8 @@ internal sealed partial class MainWindowViewModel : ViewModelBase
     {
         try
         {
+            // Set the version
+            VersionInfo = $"v{Assembly.GetExecutingAssembly().GetName().Version}";
             ModifierList = Helper.GetModifierList().ToObservableCollection();
             SelectedModifier = ModifierList.FirstOrDefault() ?? "public";
 
@@ -385,7 +411,7 @@ internal sealed partial class MainWindowViewModel : ViewModelBase
             if (SelectedServer.AutoConnect)
                 await SelectAsync();
 
-            SetAppTitle();
+            SetAppInfo();
         }
         catch (Exception ex)
         {
@@ -428,7 +454,7 @@ internal sealed partial class MainWindowViewModel : ViewModelBase
             
             FilterTables();
 
-            SetAppTitle();
+            SetAppInfo();
 
             IsConnected = true;
         }
@@ -602,12 +628,15 @@ internal sealed partial class MainWindowViewModel : ViewModelBase
     /// <returns>The observable collection</returns>
     private static ObservableCollection<TableColumnDto> FilterValues(List<TableColumnDto> source, string filter)
     {
-        return string.IsNullOrWhiteSpace(filter)
-            ? source.ToObservableCollection()
+        var tmpList = string.IsNullOrWhiteSpace(filter)
+            ? source
             : source.Where(w => w.Name.Contains(filter, StringComparison.InvariantCultureIgnoreCase) ||
                                 (!string.IsNullOrWhiteSpace(w.Schema) && w.Schema.Contains(filter,
-                                    StringComparison.InvariantCultureIgnoreCase)))
-                .ToObservableCollection();
+                                    StringComparison.InvariantCultureIgnoreCase))).ToList();
+
+        return tmpList.FirstOrDefault()?.Type == EntryType.Table
+            ? tmpList.OrderBy(o => o.Name).ToObservableCollection()
+            : tmpList.OrderBy(o => o.Position).ToObservableCollection();
     }
     #endregion
 
@@ -662,6 +691,8 @@ internal sealed partial class MainWindowViewModel : ViewModelBase
     [RelayCommand]
     private async Task GenerateClassesAsync()
     {
+        ButtonShowEfKeyCodeEnabled = false;
+
         if (!ValidateInput(out var errorMessage))
         {
             await ShowMessageAsync("Generation", errorMessage);
@@ -683,6 +714,9 @@ internal sealed partial class MainWindowViewModel : ViewModelBase
 
             // Save the current options
             await SaveOptionsAsync(options);
+
+            ButtonShowEfKeyCodeEnabled = !_efKeyCode.IsEmpty;
+            _efKeyCode = classManager.EfKeyCode;
         }
         catch (Exception ex)
         {
@@ -692,6 +726,26 @@ internal sealed partial class MainWindowViewModel : ViewModelBase
         {
             await controller.CloseAsync();
         }
+    }
+
+    /// <summary>
+    /// Occurs when the user hits the "Show EF Key Code" button.
+    /// </summary>
+    /// <remarks>
+    /// Opens the code window with the generated code.
+    /// </remarks>
+    [RelayCommand]
+    private void ShowEfKeyCode()
+    {
+        if (_efKeyCode.IsEmpty)
+            return;
+
+        var codeWindow = new CodeWindow(_efKeyCode)
+        {
+            Owner = GetMainWindow()
+        };
+
+        codeWindow.ShowDialog();
     }
 
     /// <summary>
@@ -774,17 +828,18 @@ internal sealed partial class MainWindowViewModel : ViewModelBase
     /// <summary>
     /// Sets the app title.
     /// </summary>
-    private void SetAppTitle()
+    private void SetAppInfo()
     {
-        var tmpName = AppTitleDefault;
+        var info = string.Empty;
 
         if (SelectedServer != null)
-            tmpName += $" - Server: '{SelectedServer.Name}'";
+            info += $"Server: '{SelectedServer.Name}'";
 
         if (!string.IsNullOrEmpty(SelectedDatabase))
-            tmpName += $" | Database: '{SelectedDatabase}'";
+            info += $" | Database: '{SelectedDatabase}'";
 
-        AppTitle = tmpName;
+        AppTitle = $"{AppTitleDefault} -  {info}";
+        Info = $"Connected - {info}";
     }
 
     /// <summary>

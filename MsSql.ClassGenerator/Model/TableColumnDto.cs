@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using MsSql.ClassGenerator.Common.Enums;
 using MsSql.ClassGenerator.Core.Model;
 
 namespace MsSql.ClassGenerator.Model;
@@ -57,9 +58,19 @@ public sealed partial class TableColumnDto : ObservableObject
     private bool _use = true;
 
     /// <summary>
+    /// Gets or sets the value which indicates whether the column is part of the key.
+    /// </summary>
+    public bool KeyColumn { get; set; }
+
+    /// <summary>
     /// Gets or sets the original item (table / column)
     /// </summary>
     public object? OriginalItem { get; set; }
+
+    /// <summary>
+    /// Gets or sets the type of the entry.
+    /// </summary>
+    public EntryType Type { get; }
 
     /// <summary>
     /// Gets or sets the list with the columns.
@@ -82,18 +93,21 @@ public sealed partial class TableColumnDto : ObservableObject
         Columns = table.Columns.Select(s => new TableColumnDto(s)).ToList();
         Use = true;
         OriginalItem = table;
+        Type = EntryType.Table;
     }
 
     /// <summary>
     /// Creates a new column instance.
     /// </summary>
     /// <param name="column">The source column.</param>
-    public TableColumnDto(ColumnEntry column)
+    private TableColumnDto(ColumnEntry column)
     {
         Name = column.Name;
         Alias = column.Alias;
         Position = column.Order;
         Use = true;
         OriginalItem = column;
+        Type = EntryType.Column;
+        KeyColumn = column.IsPrimaryKey;
     }
 }

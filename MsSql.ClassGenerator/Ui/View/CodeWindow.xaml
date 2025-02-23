@@ -7,41 +7,53 @@
     xmlns:local="clr-namespace:MsSql.ClassGenerator.Ui.View"
     xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewModel="clr-namespace:MsSql.ClassGenerator.Ui.ViewModel"
     Title="Code"
     Width="800"
     Height="450"
     mah:DialogParticipation.Register="{Binding}"
     Icon="../../icon.ico"
+    Loaded="CodeWindow_OnLoaded"
     ResizeMode="CanResizeWithGrip"
     TitleCharacterCasing="Normal"
     mc:Ignorable="d">
+
+    <Window.DataContext>
+        <viewModel:CodeWindowViewModel />
+    </Window.DataContext>
+
     <DockPanel LastChildFill="True">
         <StatusBar DockPanel.Dock="Bottom">
-            <StatusBarItem />
+            <StatusBarItem Content="{Binding Info}" />
         </StatusBar>
 
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <local:HeadlineControl Grid.Row="0" HeadlineText="CODE" />
-
-            <Separator Grid.Row="1" />
+            <local:HeadlineControl Grid.Row="0" HeadlineText="ModelBuilder Code" />
 
             <avalonedit:TextEditor
                 Name="CodeEditor"
-                Grid.Row="2"
+                Grid.Row="1"
                 Margin="3"
                 FontFamily="Hack,Consolas"
                 FontSize="12"
-                ShowLineNumbers="True" />
+                ShowLineNumbers="True"
+                SyntaxHighlighting="" />
 
-            <Separator Grid.Row="3" />
+            <Separator Grid.Row="2" />
+
+            <Button
+                Grid.Row="3"
+                Width="60"
+                HorizontalAlignment="Right"
+                Command="{Binding CopyCodeCommand}"
+                Content="Copy" />
         </Grid>
 
     </DockPanel>
