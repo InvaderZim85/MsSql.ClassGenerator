@@ -90,8 +90,13 @@ You can use the filter als follows:
 
 ## Planned features
 
-1. Color selection
-2. Update info
+### Open
+
+- Color selection
+
+### Done ✅
+
+- Update info - Implemented in version [v25.54.0.947](https://github.com/InvaderZim85/MsSql.ClassGenerator/releases/tag/v25.54.0.947)
 
 ## Sources / Other
 
