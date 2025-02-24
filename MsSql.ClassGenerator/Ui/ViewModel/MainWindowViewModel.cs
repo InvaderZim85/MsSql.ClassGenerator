@@ -14,6 +14,7 @@ using MsSql.ClassGenerator.Model;
 using MsSql.ClassGenerator.Ui.View;
 using System.Collections.ObjectModel;
 using Helper = MsSql.ClassGenerator.Core.Common.Helper;
+using Helper = MsSql.ClassGenerator.Core.Common.Helper;
 using System.Reflection;
 using System.Windows;
 

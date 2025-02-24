@@ -15,7 +15,6 @@ internal static class UiHelper
     #region Color theming
     /// <summary>
     /// Sets the color scheme
-    /// Init the avalon editor.
     /// </summary>
     /// <param name="colorScheme">The scheme which should be set</param>
     /// <returns>The awaitable task.</returns>
