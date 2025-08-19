@@ -20,7 +20,7 @@
     <PackageReference Include="MahApps.Metro" Version="2.4.10" />
     <PackageReference Include="MahApps.Metro.IconPacks.ForkAwesome" Version="5.1.0" />
     <PackageReference Include="Microsoft-WindowsAPICodePack-Shell" Version="1.1.5" />
-      <PackageReference Include="Microsoft.VisualStudio.Threading" Version="17.13.2" />
+      <PackageReference Include="Microsoft.VisualStudio.Threading" Version="17.14.15" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MsSql.ClassGenerator.Core\MsSql.ClassGenerator.Core.csproj" />
